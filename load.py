@@ -30,7 +30,7 @@ def plugin_start():
 	Load Template plugin into EDMC
 	"""
 	#this._IMG_KNOWN    = tk.PhotoImage(data = 'R0lGODlhEAAQAMIEAFWjVVWkVWS/ZGfFZ////////////////yH5BAEKAAQALAAAAAAQABAAAAMvSLrc/lAFIUIkYOgNXt5g14Dk0AQlaC1CuglM6w7wgs7rMpvNV4q932VSuRiPjQQAOw==')	# green circle	
-	this._IMG_KNOWN = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tick.gif')
+	this._IMG_VISITED = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tick.gif')
 	print myPlugin + "Loaded!"
 	
 	return myPlugin
@@ -50,18 +50,20 @@ def plugin_prefs(parent,cmdr,is_beta):
 	return frame
 
 def plugin_app(parent):
+	#create a new frame as a containier for the status
 	this.frame = tk.Frame(parent)
+	#We want three columns, label, text, button
 	this.frame.columnconfigure(3, weight=1)
 	
-	label = tk.Label(parent, text=  "Next Tour:")
-	parent.columnconfigure(3, weight=1)
-	this.status = tk.Label(parent, anchor=tk.W, text="Ready")
-	this.icon = tk.Label(parent, anchor=tk.W, image=this._IMG_KNOWN)
-	parent.spacer = tk.Frame(this.frame)	
-	label.grid(row = 1, column = 0, sticky=tk.W)
-	this.status.grid(row = 1, column = 1, sticky=tk.W)
+	# maybe we want to be able to change the labels?
+	this.label = tk.Label(this.frame, text=  "Next Tour:")
+	this.status = tk.Label(this.frame, anchor=tk.W, text="Getting current location")
+	this.icon = tk.Label(this.frame, anchor=tk.W, image=this._IMG_VISTED)
+	
+	#label.grid(row = 1, column = 0, sticky=tk.W)
+	#this.status.grid(row = 1, column = 1, sticky=tk.W)
 	#this.icon.pack(side=RIGHT)
-	return (label, this.status)
+	return this.frame
 
 # Log in
 
