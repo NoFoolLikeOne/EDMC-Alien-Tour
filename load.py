@@ -21,7 +21,7 @@ this.prep = {}
 myPlugin = 'Alien Tour'
 sites_file = []
 
-with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/alien_sites.json') as sites_file: 
+with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tours/alien_sites.json') as sites_file: 
 	sites = json.load(sites_file)	
 	
 
@@ -29,7 +29,8 @@ def plugin_start():
 	"""
 	Load Template plugin into EDMC
 	"""
-		
+	#this._IMG_KNOWN    = tk.PhotoImage(data = 'R0lGODlhEAAQAMIEAFWjVVWkVWS/ZGfFZ////////////////yH5BAEKAAQALAAAAAAQABAAAAMvSLrc/lAFIUIkYOgNXt5g14Dk0AQlaC1CuglM6w7wgs7rMpvNV4q932VSuRiPjQQAOw==')	# green circle	
+	this._IMG_KNOWN = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tick.gif')
 	print myPlugin + "Loaded!"
 	
 	return myPlugin
@@ -49,10 +50,17 @@ def plugin_prefs(parent,cmdr,is_beta):
 	return frame
 
 def plugin_app(parent):
-	label = tk.Label(parent, text=  "Next Tour:")
-	this.status = tk.Label(parent, anchor=tk.W, text="Ready")
+	this.frame = tk.Frame(parent)
+	this.frame.columnconfigure(3, weight=1)
 	
-		
+	label = tk.Label(parent, text=  "Next Tour:")
+	parent.columnconfigure(3, weight=1)
+	this.status = tk.Label(parent, anchor=tk.W, text="Ready")
+	this.icon = tk.Label(parent, anchor=tk.W, image=this._IMG_KNOWN)
+	parent.spacer = tk.Frame(this.frame)	
+	label.grid(row = 1, column = 0, sticky=tk.W)
+	this.status.grid(row = 1, column = 1, sticky=tk.W)
+	#this.icon.pack(side=RIGHT)
 	return (label, this.status)
 
 # Log in
@@ -71,16 +79,18 @@ def getDistance(x1,y1,z1,x2,y2,z2):
 def findNearest(jumpsystem,list):
 	nearest	= { 'distance': 999999, 'name': "Tour Completed" } 
 	n=999999
+	p=0
 	for key,value in list.iteritems():
 		#print str(n) +  ">"  + str(sysrec['distance'])
 		d = getDistance(jumpsystem["x"],jumpsystem["y"],jumpsystem["z"],value["x"],value["y"],value["z"])
-		if float(n) > float(d) and value["visited"]==0:
+		if float(n) > float(d) and value["visited"]==0 and value["priority"] >= p:
 			try:
 				n = d
+				p = value["priority"]
 				nearest=key
 			except:
 				print exception
-	return key,n,list[key]["lat"],list[key]["lon"],list[key]["active"],list[key]["body"],list[key]["text"]		
+	return key,n,list[key]["lat"],list[key]["lon"],list[key]["active"],list[key]["body"],list[key]["text"],list[key]["priority"]		
 	
 # Detect journal events
 def journal_entry(cmdr, system, station, entry):
@@ -88,7 +98,7 @@ def journal_entry(cmdr, system, station, entry):
 	if entry['event'] == 'FSDJump':
 		this.jumpsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }	
 		print this.jumpsystem
-		nearest,distance,lat,lon,active,body,text = findNearest(this.jumpsystem,sites)
+		nearest,distance,lat,lon,active,body,text,priority = findNearest(this.jumpsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
@@ -98,7 +108,7 @@ def journal_entry(cmdr, system, station, entry):
 		print "Location"
 		print entry
 		this.lastsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }
-		nearest,distance,lat,lon,active,body,text = findNearest(this.lastsystem,sites)
+		nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
@@ -119,7 +129,7 @@ def cmdr_data(data):
 	print "Commander Data"
 	#print data
 	this.lastsystem = edsmGetSystem(data['lastSystem']['name'])
-	nearest,distance,lat,lon,active,body,text = findNearest(this.lastsystem,sites)
+	nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
 	print nearest
 	print distance
 	print "setting status"
