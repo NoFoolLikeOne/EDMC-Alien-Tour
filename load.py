@@ -16,7 +16,8 @@ from config import config
 this = sys.modules[__name__]
 this.s = None
 this.prep = {}
-
+window=tk.Tk()
+window.withdraw()
 # Lets capture the plugin name we want the name - "EDMC -"
 myPlugin = 'Alien Tour'
 sites_file = []
@@ -37,7 +38,11 @@ def plugin_start():
 	
 	return myPlugin
 
+
 	
+def copy_text_to_clipboard(event):
+	window.clipboard_clear()  # clear clipboard contents
+	window.clipboard_append(this.nearest)  	
 
 def plugin_prefs(parent,cmdr,is_beta):  
 	frame = nb.Frame(parent)
@@ -61,6 +66,7 @@ def plugin_app(parent):
 	this.label = tk.Label(this.frame, text=  "Alien Sites:")
 	this.status = tk.Label(this.frame, anchor=tk.W, text="Getting current location")
 	this.clipboard = tk.Label(this.frame, anchor=tk.W, image=this._IMG_CLIPBOARD)
+	this.clipboard.bind("<Button-1>", copy_text_to_clipboard)  
 	this.tick = tk.Label(this.frame, anchor=tk.W, image=this._IMG_VISITED)
 	this.cross = tk.Label(this.frame, anchor=tk.W, image=this._IMG_IGNORE)	
 	this.spacer = tk.Frame(this.frame)
@@ -109,7 +115,7 @@ def journal_entry(cmdr, system, station, entry):
 	if entry['event'] == 'FSDJump':
 		this.jumpsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }	
 		print this.jumpsystem
-		nearest,distance,lat,lon,active,body,text,priority = findNearest(this.jumpsystem,sites)
+		this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.jumpsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
@@ -119,7 +125,7 @@ def journal_entry(cmdr, system, station, entry):
 		print "Location"
 		print entry
 		this.lastsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }
-		nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
+		this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
@@ -140,7 +146,7 @@ def cmdr_data(data):
 	print "Commander Data"
 	#print data
 	this.lastsystem = edsmGetSystem(data['lastSystem']['name'])
-	nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
+	this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
 	print nearest
 	print distance
 	print "setting status"
