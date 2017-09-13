@@ -30,7 +30,9 @@ def plugin_start():
 	Load Template plugin into EDMC
 	"""
 	#this._IMG_KNOWN    = tk.PhotoImage(data = 'R0lGODlhEAAQAMIEAFWjVVWkVWS/ZGfFZ////////////////yH5BAEKAAQALAAAAAAQABAAAAMvSLrc/lAFIUIkYOgNXt5g14Dk0AQlaC1CuglM6w7wgs7rMpvNV4q932VSuRiPjQQAOw==')	# green circle	
-	this._IMG_VISITED = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tick.gif')
+	this._IMG_VISITED = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tick3.gif')
+	this._IMG_IGNORE = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/cross.gif')
+	this._IMG_CLIPBOARD = tk.PhotoImage(file = os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/clipboard.gif')
 	print myPlugin + "Loaded!"
 	
 	return myPlugin
@@ -53,13 +55,20 @@ def plugin_app(parent):
 	#create a new frame as a containier for the status
 	this.frame = tk.Frame(parent)
 	#We want three columns, label, text, button
-	this.frame.columnconfigure(3, weight=1)
+	this.frame.columnconfigure(5, weight=1)
 	
 	# maybe we want to be able to change the labels?
-	this.label = tk.Label(this.frame, text=  "Next Tour:")
+	this.label = tk.Label(this.frame, text=  "Alien Sites:")
 	this.status = tk.Label(this.frame, anchor=tk.W, text="Getting current location")
-	this.icon = tk.Label(this.frame, anchor=tk.W, image=this._IMG_VISTED)
-	
+	this.clipboard = tk.Label(this.frame, anchor=tk.W, image=this._IMG_CLIPBOARD)
+	this.tick = tk.Label(this.frame, anchor=tk.W, image=this._IMG_VISITED)
+	this.cross = tk.Label(this.frame, anchor=tk.W, image=this._IMG_IGNORE)	
+	this.spacer = tk.Frame(this.frame)
+	this.label.grid(row = 0, column = 0, sticky=tk.W)
+	this.status.grid(row = 0, column = 1, sticky=tk.W)
+	this.clipboard.grid(row = 0, column = 2, sticky=tk.W)
+	this.tick.grid(row = 0, column = 3, sticky=tk.W)
+	this.cross.grid(row = 0, column = 4, sticky=tk.W)
 	#label.grid(row = 1, column = 0, sticky=tk.W)
 	#this.status.grid(row = 1, column = 1, sticky=tk.W)
 	#this.icon.pack(side=RIGHT)
