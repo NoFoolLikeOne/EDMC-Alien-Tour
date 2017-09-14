@@ -89,3 +89,8 @@ ENV/
 
 # Rope project settings
 .ropeproject
+data.xlsx
+~$data.xlsx
+Editing-Clipboard-icon.png
+tc.jpg
+cross.png
