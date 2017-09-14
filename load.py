@@ -7,6 +7,8 @@ import requests
 import os
 import json
 from  math import sqrt,pow,trunc
+from ttkHyperlinkLabel import HyperlinkLabel
+from urllib import quote_plus
 
 from config import applongname, appversion
 import myNotebook as nb
@@ -25,6 +27,12 @@ sites_file = []
 with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tours/alien_sites.json') as sites_file: 
 	sites = json.load(sites_file)	
 	
+def max_priority(list):
+	y = []
+	for key,value in list.iteritems():	
+		y.append(value["priority"])
+	return max(y)
+		
 
 def plugin_start():
 	"""
@@ -38,7 +46,28 @@ def plugin_start():
 	
 	return myPlugin
 
+def mark_visited(event):
+	print this.lastsystem
+	sites[this.nearest]["visited"] = 1
+	print sites[this.nearest]
+	this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.lastsystem,sites)
+	print this.nearest
+	print distance
+	this.status['text'] = this.nearest + " (" + str(distance) +"ly)"
+	this.status['url'] = 'https://www.edsm.net/show-system?systemName=%s' % quote_plus(nearest)
+	this.description["text"] = text
 
+	
+def drop_priority(event):
+	print this.lastsystem
+	sites[this.nearest]["priority"] = max_priority(sites)+1
+	print sites[this.nearest]
+	this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.lastsystem,sites)
+	print this.nearest
+	print distance
+	this.status['text'] = this.nearest + " (" + str(distance) +"ly)"
+	this.status['url'] = 'https://www.edsm.net/show-system?systemName=%s' % quote_plus(nearest)	
+	this.description["text"] = text
 	
 def copy_text_to_clipboard(event):
 	window.clipboard_clear()  # clear clipboard contents
@@ -64,17 +93,27 @@ def plugin_app(parent):
 	
 	# maybe we want to be able to change the labels?
 	this.label = tk.Label(this.frame, text=  "Alien Sites:")
-	this.status = tk.Label(this.frame, anchor=tk.W, text="Getting current location")
+	#this.status = tk.Label(this.frame, anchor=tk.W, text="Getting current location")
+	this.status = HyperlinkLabel(this.frame, compound=tk.RIGHT, popup_copy = True)
+	this.status["url"] = None
+	
+	this.system = HyperlinkLabel(parent, compound=tk.RIGHT, popup_copy = True)
 	this.clipboard = tk.Label(this.frame, anchor=tk.W, image=this._IMG_CLIPBOARD)
 	this.clipboard.bind("<Button-1>", copy_text_to_clipboard)  
+	
 	this.tick = tk.Label(this.frame, anchor=tk.W, image=this._IMG_VISITED)
+	this.tick.bind("<Button-1>", mark_visited)  
 	this.cross = tk.Label(this.frame, anchor=tk.W, image=this._IMG_IGNORE)	
+	this.cross.bind("<Button-1>", drop_priority)  
 	this.spacer = tk.Frame(this.frame)
+	this.description = tk.Label(this.frame)
+	
 	this.label.grid(row = 0, column = 0, sticky=tk.W)
 	this.status.grid(row = 0, column = 1, sticky=tk.W)
 	this.clipboard.grid(row = 0, column = 2, sticky=tk.W)
 	this.tick.grid(row = 0, column = 3, sticky=tk.W)
 	this.cross.grid(row = 0, column = 4, sticky=tk.W)
+	this.description.grid(row = 1, column = 0, columnspan=4, sticky=tk.W)
 	#label.grid(row = 1, column = 0, sticky=tk.W)
 	#this.status.grid(row = 1, column = 1, sticky=tk.W)
 	#this.icon.pack(side=RIGHT)
@@ -100,14 +139,18 @@ def findNearest(jumpsystem,list):
 	for key,value in list.iteritems():
 		#print str(n) +  ">"  + str(sysrec['distance'])
 		d = getDistance(jumpsystem["x"],jumpsystem["y"],jumpsystem["z"],value["x"],value["y"],value["z"])
-		if float(n) > float(d) and value["visited"]==0 and value["priority"] >= p:
-			try:
-				n = d
-				p = value["priority"]
-				nearest=key
-			except:
-				print exception
-	return key,n,list[key]["lat"],list[key]["lon"],list[key]["active"],list[key]["body"],list[key]["text"],list[key]["priority"]		
+		if value["visited"] == 0:
+			if  float(d) < float(n) and value["priority"] <= p:
+				try:
+					n = d
+					p = value["priority"]
+					nearest=key
+				except:
+					print exception
+	
+	return nearest,n,list[nearest]["lat"],list[nearest]["lon"],list[nearest]["active"],list[nearest]["body"],list[nearest]["text"],list[nearest]["priority"],list[nearest]["x"],list[nearest]["y"],list[nearest]["z"]
+		
+		
 	
 # Detect journal events
 def journal_entry(cmdr, system, station, entry):
@@ -115,25 +158,29 @@ def journal_entry(cmdr, system, station, entry):
 	if entry['event'] == 'FSDJump':
 		this.jumpsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }	
 		print this.jumpsystem
-		this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.jumpsystem,sites)
+		this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.jumpsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
+		this.status['url'] = 'https://www.edsm.net/show-system?systemName=%s' % quote_plus(nearest)
+		this.description["text"] = text
 		print "Commander Data"
 		
 	if entry['event'] == 'Location':
 		print "Location"
 		print entry
 		this.lastsystem = { "x": entry["StarPos"][0], "y": entry["StarPos"][1], "z": entry["StarPos"][2], "name": entry["StarSystem"] }
-		this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
+		this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.lastsystem,sites)
 		print nearest
 		print distance
 		this.status['text'] = nearest + " (" + str(distance) +"ly)"
+		this.status['url'] = 'https://www.edsm.net/show-system?systemName=%s' % quote_plus(nearest)
+		this.description["text"] = text
 		print "Commander Data"
 	
 	
 def edsmGetSystem(system):
-	url = 'https://www.edsm.net/api-v1/system?systemName='+system+'&showCoordinates=1'		
+	url = 'https://www.edsm.net/api-v1/system?systemName='+quote_plus(system)+'&showCoordinates=1'		
 	print url
 	r = requests.get(url)
 	s =  r.json()
@@ -146,10 +193,12 @@ def cmdr_data(data):
 	print "Commander Data"
 	#print data
 	this.lastsystem = edsmGetSystem(data['lastSystem']['name'])
-	this.nearest,distance,lat,lon,active,body,text,priority = findNearest(this.lastsystem,sites)
-	print nearest
+	this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.lastsystem,sites)
+	print this.nearest
 	print distance
 	print "setting status"
-	this.status['text'] = nearest + " (" + str(distance) +"ly)"
+	this.status['text'] = this.nearest + " (" + str(distance) +"ly)"
+	this.status['url'] = 'https://www.edsm.net/show-system?systemName=%s' % quote_plus(nearest)
+	this.description["text"] = text
 	print "Commander Data"
 
