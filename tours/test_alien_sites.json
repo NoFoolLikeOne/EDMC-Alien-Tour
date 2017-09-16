@@ -1,0 +1,6 @@
+{
+  "HIP 19026": { "body": "HIP 19026 B 1 C","lat":-17.9575,"lon": -152.6994,"active": "N","x": -117.875,"y": -65.125,"z": -330.90625,"text":  "Land at coordinates -17.9575 : -152.6994", "visited": 0, "priority": 0 },
+ "ARIES DARK REGION DB-X D1-63": { "body": "ARIES DARK REGION DB-X D1-63 A 7 A","lat":25.5553,"lon": 78.1765,"active": "N","x": -119.625,"y": -90.84375,"z": -247.03125,"text":  "Land at coordinates 25.5553 : 78.1765", "visited": 0, "priority": 0 },
+ "PLEIADES SECTOR OS-U C2-7": { "body": "PLEIADES SECTOR OS-U C2-7 0.166666666666667","lat":58.4244,"lon": -177.0446,"active": "N","x": -68.71875,"y": -229.625,"z": -325.6875,"text":  "Land at coordinates 58.4244 : -177.0446", "visited": 0, "priority": 0 },
+ "COL 285 SECTOR CV-Y D57": { "body": "COL 285 SECTOR CV-Y D57 AB 4 A","lat":4.7654,"lon": 136.2398,"active": "N","x": -21.28125,"y": -76.34375,"z": -288.15625,"text":  "Land at coordinates 4.7654 : 136.2398", "visited": 0, "priority": 0 }
+}
