@@ -27,9 +27,32 @@ sites_file = []
 with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tours/alien_sites.json') as sites_file: 
 	sites = json.load(sites_file)	
 	
+visits = []
+	
+try:
+	with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tours/visited.json') as visits_file:
+		visits = json.load(visits_file)		
+	merge_visits(visits)
+except:
+	print "First time for everything"
+	
+	
+
+
+		
+def merge_visits(visits):
+	for key,value in visits.iteritems():
+		try:
+			if sites[key]["visited"]==0:
+				sites[key]["visited"]=1
+		except:
+			print "Not foud in sites: "+key			
+	
+
+	
 def max_priority(list):
 	y = []
-	for key,value in list.iteritems():	
+	for key,value in list.iteritems():
 		y.append(value["priority"])
 	return max(y)
 		
@@ -46,13 +69,23 @@ def plugin_start():
 	
 	return myPlugin
 
+def save_vists(list,tour):
+	out = {}
+	for key,value in list.iteritems():
+		if value["visited"] == 1:
+			out[key]=value["visited"]
+	with open(os.path.realpath(os.path.dirname(os.path.realpath(__file__)))+'/tours/visited.json', 'w') as outfile:
+		json.dump(out, outfile)
+	print out
+	
+	
 def mark_visited(event):
 	print this.lastsystem
 	sites[this.nearest]["visited"] = 1
 	print sites[this.nearest]
 	this.nearest,distance,lat,lon,active,body,text,priority,x,y,z = findNearest(this.lastsystem,sites)
 	setStatus(nearest,distance,body,text,lat,long)
-	
+	save_vists(sites,"aliens")
 	
 		
 
@@ -104,7 +137,7 @@ def plugin_app(parent):
 	this.cross = tk.Label(this.frame, anchor=tk.W, image=this._IMG_IGNORE)	
 	this.cross.bind("<Button-1>", drop_priority)  
 	this.spacer = tk.Frame(this.frame)
-	this.description = tk.Label(this.frame)
+	this.description = tk.Message(this.frame,width=200)
 	this.body_label = tk.Label(this.frame, text=  "Body:")
 	this.body = tk.Label(this.frame)
 
