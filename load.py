@@ -117,7 +117,10 @@ def plugin_prefs(parent,cmdr,is_beta):
 	return frame
 
 def plugin_app(parent):
+	
+	this.parent = parent
 	#create a new frame as a containier for the status
+	
 	this.frame = tk.Frame(parent)
 	#We want three columns, label, text, button
 	this.frame.columnconfigure(5, weight=1)
@@ -224,6 +227,7 @@ def setStatus(nearest,distance,xbody,text,lat,long):
 		this.cross.grid()
 		this.body.grid()
 		this.body_label.grid()
+		this.description["width"]=this.parent.winfo_width()
 		this.description.grid()
 	
 # Detect journal events
