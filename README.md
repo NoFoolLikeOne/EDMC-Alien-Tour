@@ -28,7 +28,7 @@ Items are highlighted in red.
 
 
 # Installation
-Download the [latest release](https://github.com/NoFoolLikeOne/EDMC-Alien-Tour/archive/1.0.zip), open the archive (zip) and extract the folder to your EDMC plugin folder.
+Download the [latest release](https://github.com/NoFoolLikeOne/EDMC-Alien-Tour/archive/1.1.zip), open the archive (zip) and extract the folder to your EDMC plugin folder.
 
 Rename the folder to EDMC-Alien-Tour
 
